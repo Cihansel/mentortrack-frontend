@@ -67,6 +67,33 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
       // other options...
+
+## Deployment Notes (Vercel + Railway)
+
+### Frontend (Vercel)
+- Production URL: https://mentortrack-frontend.vercel.app
+- SPA Routing Fix:
+  - `vercel.json` eklendi.
+  - Amaç: `/login` gibi sayfalarda refresh yapınca 404 almamak.
+  - Config:
+    ```json
+    {
+      "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+    }
+    ```
+
+### Environment Variables (Vercel)
+Vercel Project Settings → Environment Variables:
+- VITE_API_URL = https://mentortrack-backend-production.up.railway.app
+
+### Backend (Railway)
+- Base URL: https://mentortrack-backend-production.up.railway.app
+- Health: /health
+
+### Backend Env (Railway)
+Railway Service → Variables:
+- DATABASE_URL = (Railway Postgres URL)
+- JWT_SECRET = (secret)
     },
   },
 ])
