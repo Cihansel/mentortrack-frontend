@@ -1,11 +1,11 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../../api/axiosInstance"; // ✅ axios yerine bunu kullan
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setAuth } = useAuth(); // 🔑 ÖNEMLİ DEĞİŞİKLİK
+  const { setAuth } = useAuth();
 
   const [activeTab, setActiveTab] = useState<"student" | "parent">("student");
 
@@ -25,7 +25,8 @@ export default function Login() {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:4000/student/login", {
+      // ✅ localhost yerine relative endpoint
+      const res = await api.post("/student/login", {
         name: studentName,
         password: studentPassword,
       });
@@ -37,19 +38,14 @@ export default function Login() {
         return;
       }
 
-      // ✅ STUDENT AUTH SET
-      setAuth({
-  token,
-  role,
-  userId,
-});
+      setAuth({ token, role, userId });
 
-localStorage.setItem(
-  "mentortrack_auth",
-  JSON.stringify({ token, role, userId })
-);
+      localStorage.setItem(
+        "mentortrack_auth",
+        JSON.stringify({ token, role, userId })
+      );
 
-navigate("/student");
+      navigate("/student");
     } catch (err: any) {
       setError(err.response?.data?.error || "Giriş başarısız.");
     }
@@ -63,7 +59,8 @@ navigate("/student");
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:4000/parent/login", {
+      // ✅ localhost yerine relative endpoint
+      const res = await api.post("/parent/login", {
         email: parentEmail,
         password: parentPassword,
       });
@@ -75,7 +72,6 @@ navigate("/student");
         return;
       }
 
-      // ✅ PARENT AUTH SET
       setAuth({
         token,
         role,
@@ -83,6 +79,7 @@ navigate("/student");
         email: email ?? null,
       });
 
+      // (İstersen bunu da student gibi localStorage'a yazalım, şimdilik dokunmuyorum)
       navigate("/parent");
     } catch (err: any) {
       setError(err.response?.data?.error || "Giriş başarısız.");
@@ -92,7 +89,6 @@ navigate("/student");
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md">
-
         {/* Üst Tab Menü */}
         <div className="flex mb-6 border-b">
           <button
@@ -129,9 +125,7 @@ navigate("/student");
         {activeTab === "student" && (
           <form onSubmit={handleStudentLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Ad Soyad
-              </label>
+              <label className="block text-sm font-medium mb-1">Ad Soyad</label>
               <input
                 type="text"
                 value={studentName}
@@ -142,9 +136,7 @@ navigate("/student");
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Şifre
-              </label>
+              <label className="block text-sm font-medium mb-1">Şifre</label>
               <input
                 type="password"
                 value={studentPassword}
@@ -164,9 +156,7 @@ navigate("/student");
         {activeTab === "parent" && (
           <form onSubmit={handleParentLogin} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Email
-              </label>
+              <label className="block text-sm font-medium mb-1">Email</label>
               <input
                 type="email"
                 value={parentEmail}
@@ -177,9 +167,7 @@ navigate("/student");
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Şifre
-              </label>
+              <label className="block text-sm font-medium mb-1">Şifre</label>
               <input
                 type="password"
                 value={parentPassword}
