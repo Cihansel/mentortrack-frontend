@@ -94,6 +94,7 @@ Vercel Project Settings → Environment Variables:
 Railway Service → Variables:
 - DATABASE_URL = (Railway Postgres URL)
 - JWT_SECRET = (secret)
+deploy trigger
     },
   },
 ])
