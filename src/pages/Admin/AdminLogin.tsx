@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../api/axiosInstance";
 import { useAuth } from "../../context/AuthContext";
 
 export default function AdminLogin() {
@@ -18,7 +18,7 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:4000/auth/login", {
+      const res = await api.post("/auth/login", {
         email,
         password,
       });
@@ -29,13 +29,18 @@ export default function AdminLogin() {
         throw new Error("Bu giriş admin hesabına ait değil.");
       }
 
-      // ✅ TEK DOĞRU NOKTA
       setAuth({
         token,
         role,
         email: adminEmail,
         userId: userId ?? null,
       });
+
+      // (İstersen admin’i de localStorage’a yaz, interceptor zaten oradan okuyor)
+      localStorage.setItem(
+        "mentortrack_auth",
+        JSON.stringify({ token, role, userId: userId ?? null, email: adminEmail })
+      );
 
       navigate("/admin");
     } catch (err: any) {

@@ -1,15 +1,13 @@
-import axios from "axios";
-
-const API = "http://localhost:4000";
+import api from "./axiosInstance";
 
 export const getCourses = () => {
-  return axios.get(`${API}/courses`); // GET /courses
+  return api.get("/courses");
 };
 
 export const createCourse = (data: { name: string }) => {
-  return axios.post(`${API}/courses/create`, data); // POST /courses/create
+  return api.post("/courses/create", data);
 };
 
 export const deleteCourse = (id: number) => {
-  return axios.delete(`${API}/courses/${id}`); // DELETE /courses/:id
+  return api.delete(`/courses/${id}`);
 };
