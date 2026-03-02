@@ -3,14 +3,11 @@ import axios from "axios";
 const baseURL = import.meta.env.VITE_API_URL;
 
 if (!baseURL) {
-  // Vercel build loglarında + browser console’da görünür
   console.error("❌ VITE_API_URL is missing. Check Vercel env vars.");
-  // İstersen burada throw da atabilirsin:
-  // throw new Error("VITE_API_URL is missing");
 }
 
 const api = axios.create({
-  baseURL, // ❗ fallback yok
+  baseURL,
   withCredentials: true,
 });
 
@@ -45,9 +42,16 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status;
+    const url = (error.config?.url as string) || "";
 
-    if (status === 401) {
-      console.warn("Unauthorized → Token geçersiz");
+    // ✅ Login endpointleri 401 dönebilir → redirect yapma
+    const isLoginRequest =
+      url.includes("/auth/login") ||
+      url.includes("/student/login") ||
+      url.includes("/parent/login");
+
+    if (status === 401 && !isLoginRequest) {
+      console.warn("Unauthorized → Token geçersiz (logout)");
       localStorage.removeItem("mentortrack_auth");
       window.location.href = "/login";
     }
