@@ -25,51 +25,33 @@ export default function Layout() {
   }, [mobileOpen]);
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* ✅ Mobile: hamburger */}
-      <button
-        type="button"
-        onClick={() => setMobileOpen(true)}
-        className="md:hidden fixed top-4 left-4 z-50 rounded-lg bg-black/60 text-white px-3 py-2"
-        aria-label="Menüyü aç"
-      >
-        ☰
-      </button>
-
+    <div className="min-h-dvh bg-gray-100">
       {/* ✅ Mobile overlay */}
       {mobileOpen && (
-        <div
+        <button
+          type="button"
           className="md:hidden fixed inset-0 z-40 bg-black/50"
           onClick={() => setMobileOpen(false)}
+          aria-label="Menüyü kapat"
         />
       )}
 
-      {/* Sidebar */}
-      <div
-        className={`
-          fixed inset-y-0 left-0 z-50
-          transform transition-transform duration-300
-          md:static md:translate-x-0
-          ${mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-        `}
-      >
-        <Sidebar
-          open={open}
-          setOpen={setOpen}
-          onLogout={handleLogout}
-          // ✅ Sidebar içinden menüye tıklayınca mobilde kapatabilmek için
-          onNavigate={() => setMobileOpen(false)}
-        />
-      </div>
+      {/* ✅ Sidebar */}
+      <Sidebar
+        open={open}
+        setOpen={setOpen}
+        mobileOpen={mobileOpen}
+        setMobileOpen={setMobileOpen}
+        onLogout={handleLogout}
+        onNavigate={() => setMobileOpen(false)}
+      />
 
-      {/* Main */}
+      {/* ✅ Main */}
       <main
-        className={`
-          p-4 md:p-6 w-full min-h-screen
-          transition-all duration-300
-          ml-0
-          md:${open ? "ml-64" : "ml-20"}
-        `}
+        className={[
+          "min-h-dvh w-full p-4 md:p-6 transition-all duration-300",
+          open ? "md:ml-64" : "md:ml-20",
+        ].join(" ")}
       >
         <Outlet />
       </main>
