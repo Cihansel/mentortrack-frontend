@@ -91,14 +91,13 @@ export default function Dashboard() {
       }
     };
 
-    // Her endpoint ayrı ayrı yakalanır → biri patlarsa diğerleri çalışmaya devam eder
     const [students, courses, testSets, sources, rec, live] = await Promise.all([
       safeGet<any[]>("/students"),
       safeGet<any[]>("/courses"),
       safeGet<any[]>("/testsets"),
       safeGet<any[]>("/sources"),
       safeGet<StudyRecord[]>("/studyrecords"),
-      safeGet<LiveStudent[]>("/admin/live-students")
+      safeGet<LiveStudent[]>("/admin/live-students"),
     ]);
 
     const studentsArr = students ?? [];
@@ -118,12 +117,9 @@ export default function Dashboard() {
     setRecords(recArr);
     setLiveStudents(liveArr);
 
-    // Grafik: son 7 kaydı tarihe göre sıralayıp alıyoruz
     const last7 = recArr
       .slice()
-      .sort(
-        (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-      )
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(-7)
       .map((r) => ({
         date: new Date(r.date).toLocaleDateString("tr-TR", {
@@ -164,16 +160,12 @@ export default function Dashboard() {
 
     const topId =
       Object.keys(groupedByStudent).length > 0
-        ? Number(
-            Object.entries(groupedByStudent).sort((a, b) => b[1] - a[1])[0][0]
-          )
+        ? Number(Object.entries(groupedByStudent).sort((a, b) => b[1] - a[1])[0][0])
         : null;
 
     if (!topId) return "-";
 
-    return (
-      records.find((r) => Number(r.studentId) === topId)?.student?.name ?? "-"
-    );
+    return records.find((r) => Number(r.studentId) === topId)?.student?.name ?? "-";
   }, [records]);
 
   const mostWorkedTopicName = useMemo(() => {
@@ -187,9 +179,7 @@ export default function Dashboard() {
 
     const topId =
       Object.keys(groupedByTopic).length > 0
-        ? Number(
-            Object.entries(groupedByTopic).sort((a, b) => b[1] - a[1])[0][0]
-          )
+        ? Number(Object.entries(groupedByTopic).sort((a, b) => b[1] - a[1])[0][0])
         : null;
 
     if (!topId) return "-";
@@ -198,16 +188,16 @@ export default function Dashboard() {
   }, [records]);
 
   if (loading) {
-    return <div className="p-8 text-xl">Yükleniyor...</div>;
+    return <div className="p-4 sm:p-6 lg:p-8 text-xl">Yükleniyor...</div>;
   }
 
   return (
-    <div className="p-8">
-      <h1 className="text-3xl font-bold mb-8">👋 Hoş Geldin!</h1>
+    <div className="p-4 sm:p-6 lg:p-8">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-6 sm:mb-8">👋 Hoş Geldin!</h1>
 
-      {/* HATA PANELİ (boş veri mi, 403 mü hemen anlaşılır) */}
+      {/* HATA PANELİ */}
       {errors.length > 0 && (
-        <div className="mb-8 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl">
+        <div className="mb-6 sm:mb-8 bg-red-50 border border-red-200 text-red-700 p-4 rounded-xl">
           <div className="font-semibold mb-2">Bazı istekler başarısız:</div>
           <ul className="list-disc pl-5 text-sm space-y-1">
             {errors.map((e, i) => (
@@ -215,14 +205,13 @@ export default function Dashboard() {
             ))}
           </ul>
           <div className="text-xs mt-2 opacity-80">
-            Not: 403 alıyorsan Admin token’ı yok/yanlış role ile giriş yapılmış
-            olabilir.
+            Not: 403 alıyorsan Admin token’ı yok/yanlış role ile giriş yapılmış olabilir.
           </div>
         </div>
       )}
 
       {/* TOP STATS */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
         <InfoCard
           icon={<Users size={28} />}
           title="Öğrenci"
@@ -252,11 +241,11 @@ export default function Dashboard() {
       {/* CHART */}
       <GlassCard title="Son 7 Gün – Çözülen Soru Sayısı">
         {chartData.length === 0 ? (
-          <div className="p-6 text-gray-600">
+          <div className="p-4 sm:p-6 text-gray-600">
             Henüz çalışma kaydı yok. Öğrenciler test bitirdikçe burada görünecek.
           </div>
         ) : (
-          <div className="h-[300px]">
+          <div className="h-[220px] sm:h-[280px] lg:h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -271,7 +260,7 @@ export default function Dashboard() {
       </GlassCard>
 
       {/* QUICK INSIGHTS */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-8 sm:mt-10">
         <QuickInsightCard
           icon={<Timer className="text-blue-600" size={26} />}
           title="Toplam Süre"
@@ -290,9 +279,9 @@ export default function Dashboard() {
       </div>
 
       {/* LIVE STUDENTS */}
-      <div className="mt-10 bg-white/60 backdrop-blur-xl p-6 rounded-2xl shadow border">
+      <div className="mt-8 sm:mt-10 bg-white/60 backdrop-blur-xl p-4 sm:p-6 rounded-2xl shadow border">
         <div className="flex items-center justify-between gap-4 mb-4">
-          <h2 className="text-xl font-semibold">🟢 Canlı Öğrenci Durumu</h2>
+          <h2 className="text-lg sm:text-xl font-semibold">🟢 Canlı Öğrenci Durumu</h2>
           <button
             onClick={loadData}
             className="text-sm px-3 py-2 rounded-lg border bg-white hover:bg-gray-50"
@@ -304,37 +293,39 @@ export default function Dashboard() {
         {liveStudents.length === 0 ? (
           <p className="text-gray-500">Aktif öğrenci yok.</p>
         ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b">
-                <th className="p-2 text-left">Öğrenci</th>
-                <th className="p-2 text-center">Durum</th>
-                <th className="p-2 text-center">Son Aktivite</th>
-              </tr>
-            </thead>
-            <tbody>
-              {liveStudents.map((s) => (
-                <tr key={s.id} className="border-b">
-                  <td className="p-2 font-medium">{s.name}</td>
-                  <td className="p-2 text-center">
-                    <StatusBadge status={s.status} />
-                  </td>
-                  <td className="p-2 text-center text-gray-500">
-                    {s.lastActivityAt
-                      ? new Date(s.lastActivityAt).toLocaleString("tr-TR")
-                      : "-"}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm min-w-[520px]">
+              <thead>
+                <tr className="border-b">
+                  <th className="p-2 text-left">Öğrenci</th>
+                  <th className="p-2 text-center">Durum</th>
+                  <th className="p-2 text-center">Son Aktivite</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {liveStudents.map((s) => (
+                  <tr key={s.id} className="border-b">
+                    <td className="p-2 font-medium">{s.name}</td>
+                    <td className="p-2 text-center">
+                      <StatusBadge status={s.status} />
+                    </td>
+                    <td className="p-2 text-center text-gray-500">
+                      {s.lastActivityAt
+                        ? new Date(s.lastActivityAt).toLocaleString("tr-TR")
+                        : "-"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 
       {/* MOTIVATION */}
-      <div className="mt-10 p-8 rounded-3xl bg-gradient-to-r from-blue-600/80 to-indigo-600/80 text-white shadow-xl">
-        <h2 className="text-2xl font-bold mb-2">Harika Gidiyorsun! 🚀</h2>
-        <p className="opacity-90 text-lg">
+      <div className="mt-8 sm:mt-10 p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-600/80 to-indigo-600/80 text-white shadow-xl">
+        <h2 className="text-xl sm:text-2xl font-bold mb-2">Harika Gidiyorsun! 🚀</h2>
+        <p className="opacity-90 text-base sm:text-lg">
           Bu hafta toplam <strong>{totalQuestions} soru</strong> çözüldü.
           Öğrencilerin performansı yükselmeye devam ediyor!
         </p>
@@ -357,7 +348,7 @@ function InfoCard({
   color: string;
 }) {
   return (
-    <div className="bg-white/40 p-6 rounded-2xl shadow border flex items-center gap-4">
+    <div className="bg-white/40 p-4 sm:p-6 rounded-2xl shadow border flex items-center gap-4">
       <div
         className={`w-14 h-14 rounded-xl text-white flex items-center justify-center bg-gradient-to-br ${color}`}
       >
@@ -365,7 +356,7 @@ function InfoCard({
       </div>
       <div>
         <p className="text-gray-600 text-sm">{title}</p>
-        <p className="text-3xl font-bold">{value}</p>
+        <p className="text-2xl sm:text-3xl font-bold">{value}</p>
       </div>
     </div>
   );
@@ -379,9 +370,9 @@ function GlassCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="bg-white/40 p-6 rounded-2xl shadow border mt-10">
-      <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-        <BarChart3 /> {title}
+    <div className="bg-white/40 p-4 sm:p-6 rounded-2xl shadow border">
+      <h2 className="text-lg sm:text-xl font-semibold mb-4 flex items-center gap-2">
+        <BarChart3 className="shrink-0" /> {title}
       </h2>
       {children}
     </div>
@@ -398,35 +389,34 @@ function QuickInsightCard({
   value: string;
 }) {
   return (
-    <div className="bg-white/60 p-6 rounded-2xl shadow border flex items-center gap-4">
+    <div className="bg-white/60 p-4 sm:p-6 rounded-2xl shadow border flex items-center gap-4">
       <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow">
         {icon}
       </div>
-      <div>
+      <div className="min-w-0">
         <p className="text-gray-600 text-sm">{title}</p>
-        <p className="text-xl font-bold">{value}</p>
+        <p className="text-lg sm:text-xl font-bold truncate">{value}</p>
       </div>
     </div>
   );
 }
 
 function StatusBadge({ status }: { status: LiveStudent["status"] }) {
- const colors: Record<LiveStudent["status"], string> = {
-  OFFLINE: "bg-gray-300 text-gray-600",
-  IDLE: "bg-gray-200 text-gray-700",
-  ASSIGNED: "bg-blue-100 text-blue-700",
-  STARTED: "bg-orange-100 text-orange-700",
-  FINISHED: "bg-green-100 text-green-700",
-};
+  const colors: Record<LiveStudent["status"], string> = {
+    OFFLINE: "bg-gray-300 text-gray-600",
+    IDLE: "bg-gray-200 text-gray-700",
+    ASSIGNED: "bg-blue-100 text-blue-700",
+    STARTED: "bg-orange-100 text-orange-700",
+    FINISHED: "bg-green-100 text-green-700",
+  };
 
-const labels: Record<LiveStudent["status"], string> = {
-  OFFLINE: "OFFLINE",
-  IDLE: "IDLE",
-  ASSIGNED: "ASSIGNED",
-  STARTED: "STARTED",
-  FINISHED: "FINISHED",
-};
-
+  const labels: Record<LiveStudent["status"], string> = {
+    OFFLINE: "OFFLINE",
+    IDLE: "IDLE",
+    ASSIGNED: "ASSIGNED",
+    STARTED: "STARTED",
+    FINISHED: "FINISHED",
+  };
 
   return (
     <span

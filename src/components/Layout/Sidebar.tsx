@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import {
   HomeIcon,
   UserGroupIcon,
-  UserCircleIcon, // ✅ EKLENDİ
+  UserCircleIcon,
   BookOpenIcon,
   RectangleGroupIcon,
   QueueListIcon,
@@ -14,19 +14,17 @@ import {
 } from "@heroicons/react/24/outline";
 
 type Props = {
-  open: boolean;
-  setOpen: (v: boolean) => void;
+  open: boolean;                 // desktop collapse
+  setOpen: (v: boolean) => void; // desktop collapse toggle
   onLogout: () => void;
+  onNavigate?: () => void;       // ✅ mobil drawer kapatmak için
 };
 
-export default function Sidebar({ open, setOpen, onLogout }: Props) {
+export default function Sidebar({ open, setOpen, onLogout, onNavigate }: Props) {
   const menu = [
     { name: "Dashboard", to: "/admin", icon: HomeIcon },
     { name: "Öğrenciler", to: "/admin/students", icon: UserGroupIcon },
-
-    // ✅ YENİ: VELİLER
     { name: "Veliler", to: "/admin/parents", icon: UserCircleIcon },
-
     { name: "Dersler", to: "/admin/courses", icon: BookOpenIcon },
     { name: "Üniteler", to: "/admin/units", icon: RectangleGroupIcon },
     { name: "Konular", to: "/admin/topics", icon: QueueListIcon },
@@ -41,9 +39,14 @@ export default function Sidebar({ open, setOpen, onLogout }: Props) {
       {/* SIDEBAR */}
       <div
         className={`
-          h-screen fixed top-0 left-0 border-r
-          transition-all duration-300 flex flex-col z-40
+          h-screen border-r transition-all duration-300 flex flex-col
           ${open ? "bg-white/30 backdrop-blur-lg w-64" : "bg-gray-900/70 backdrop-blur-lg w-20"}
+
+          /* ✅ desktopta sabit sidebar */
+          md:fixed md:top-0 md:left-0
+
+          /* ✅ mobilde Layout wrapper zaten fixed veriyor, burada static kalsın */
+          fixed top-0 left-0
         `}
         style={{
           boxShadow: open
@@ -65,6 +68,7 @@ export default function Sidebar({ open, setOpen, onLogout }: Props) {
             <button
               onClick={() => setOpen(false)}
               className="p-2 rounded hover:bg-black/10 transition"
+              aria-label="Sidebar daralt"
             >
               <ChevronLeftIcon className="w-6 h-6 text-gray-800" />
             </button>
@@ -79,6 +83,10 @@ export default function Sidebar({ open, setOpen, onLogout }: Props) {
               to={item.to}
               end={item.to === "/admin" || item.to === "/admin/topics"}
               title={!open ? item.name : ""}
+              onClick={() => {
+                // ✅ mobilde menü seçince drawer kapansın
+                onNavigate?.();
+              }}
               className={({ isActive }) => `
                 flex items-center gap-3 mx-2 px-4 py-3 rounded-lg
                 transition-all duration-200 group
@@ -113,7 +121,10 @@ export default function Sidebar({ open, setOpen, onLogout }: Props) {
         {/* 🔴 LOGOUT */}
         <div className="p-3 border-t">
           <button
-            onClick={onLogout}
+            onClick={() => {
+              onLogout();
+              onNavigate?.(); // ✅ mobilde logout sonrası drawer kapansın
+            }}
             className={`
               flex items-center gap-3 w-full px-4 py-3 rounded-lg
               transition
@@ -136,16 +147,18 @@ export default function Sidebar({ open, setOpen, onLogout }: Props) {
         </div>
       </div>
 
-      {/* AÇMA BUTONU */}
+      {/* ✅ Desktop collapse açma butonu (mobilde kapalı) */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
           className="
+            hidden md:block
             fixed top-4 left-4 z-50
             p-2 rounded-lg backdrop-blur-lg
             bg-gray-900/40 hover:bg-gray-900/60
             transition border border-white/20
           "
+          aria-label="Sidebar genişlet"
         >
           <Bars3Icon className="w-6 h-6 text-white" />
         </button>
