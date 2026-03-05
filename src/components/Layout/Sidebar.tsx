@@ -10,29 +10,17 @@ import {
   ClipboardDocumentListIcon,
   Bars3Icon,
   ChevronLeftIcon,
-  XMarkIcon,
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 
 type Props = {
-  open: boolean; // desktop collapse
+  open: boolean;
   setOpen: (v: boolean) => void;
-
-  mobileOpen: boolean; // ✅ mobile drawer state
-  setMobileOpen: (v: boolean) => void;
-
   onLogout: () => void;
-  onNavigate?: () => void; // ✅ mobilde drawer kapatmak için
+  onNavigate?: () => void;
 };
 
-export default function Sidebar({
-  open,
-  setOpen,
-  mobileOpen,
-  setMobileOpen,
-  onLogout,
-  onNavigate,
-}: Props) {
+export default function Sidebar({ open, setOpen, onLogout, onNavigate }: Props) {
   const menu = [
     { name: "Dashboard", to: "/admin", icon: HomeIcon },
     { name: "Öğrenciler", to: "/admin/students", icon: UserGroupIcon },
@@ -48,29 +36,11 @@ export default function Sidebar({
 
   return (
     <>
-      {/* ✅ MOBILE: hamburger (drawer kapalıyken görünür) */}
-      {!mobileOpen && (
-        <button
-          type="button"
-          onClick={() => setMobileOpen(true)}
-          className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-black/60 text-white"
-          aria-label="Menüyü aç"
-        >
-          <Bars3Icon className="w-6 h-6" />
-        </button>
-      )}
-
-      {/* ✅ SIDEBAR CONTAINER */}
-      <aside
-        className={[
-          "fixed inset-y-0 left-0 z-50 flex flex-col border-r transition-all duration-300",
-          "h-dvh", // ✅ daha doğru viewport height (mobilde)
-          open ? "w-64 bg-white/30 backdrop-blur-lg" : "w-20 bg-gray-900/70 backdrop-blur-lg",
-
-          // ✅ mobile drawer behaviour
-          "md:translate-x-0",
-          mobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
-        ].join(" ")}
+      <div
+        className={`
+          h-screen border-r transition-all duration-300 flex flex-col
+          ${open ? "bg-white/30 backdrop-blur-lg w-64" : "bg-gray-900/70 backdrop-blur-lg w-20"}
+        `}
         style={{
           boxShadow: open
             ? "0 8px 32px rgba(0,0,0,0.15)"
@@ -80,30 +50,17 @@ export default function Sidebar({
         {/* ÜST */}
         <div className="flex items-center justify-between p-4">
           <h1
-            className={[
-              "text-2xl font-bold transition-all",
-              open ? "opacity-100 text-gray-900" : "opacity-0 w-0 overflow-hidden",
-            ].join(" ")}
+            className={`text-2xl font-bold transition-all ${
+              open ? "opacity-100 text-gray-900" : "opacity-0 w-0 overflow-hidden"
+            }`}
           >
             MentorTrack
           </h1>
 
-          {/* ✅ MOBILE: drawer close (X) */}
-          <button
-            type="button"
-            onClick={() => setMobileOpen(false)}
-            className="md:hidden p-2 rounded hover:bg-black/10 transition"
-            aria-label="Menüyü kapat"
-          >
-            <XMarkIcon className="w-6 h-6 text-gray-800" />
-          </button>
-
-          {/* ✅ DESKTOP: collapse */}
           {open && (
             <button
-              type="button"
               onClick={() => setOpen(false)}
-              className="hidden md:inline-flex p-2 rounded hover:bg-black/10 transition"
+              className="p-2 rounded hover:bg-black/10 transition"
               aria-label="Sidebar daralt"
             >
               <ChevronLeftIcon className="w-6 h-6 text-gray-800" />
@@ -112,17 +69,14 @@ export default function Sidebar({
         </div>
 
         {/* MENU */}
-        <nav className="mt-2 space-y-2 flex-1 overflow-y-auto pb-4">
+        <nav className="mt-4 space-y-2 flex-1">
           {menu.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.to === "/admin" || item.to === "/admin/topics"}
               title={!open ? item.name : ""}
-              onClick={() => {
-                onNavigate?.();
-                setMobileOpen(false); // ✅ mobilde tıklayınca kapat
-              }}
+              onClick={() => onNavigate?.()}
               className={({ isActive }) => `
                 flex items-center gap-3 mx-2 px-4 py-3 rounded-lg
                 transition-all duration-200 group
@@ -137,17 +91,8 @@ export default function Sidebar({
                 }
               `}
             >
-              <item.icon
-                className={`w-6 h-6 ${
-                  open ? "text-gray-800" : "text-white"
-                } group-hover:text-white`}
-              />
-
-              <span
-                className={`transition-all duration-300 ${
-                  open ? "opacity-100" : "opacity-0 w-0 overflow-hidden"
-                }`}
-              >
+              <item.icon className={`w-6 h-6 ${open ? "text-gray-800" : "text-white"} group-hover:text-white`} />
+              <span className={`transition-all duration-300 ${open ? "opacity-100" : "opacity-0 w-0 overflow-hidden"}`}>
                 {item.name}
               </span>
             </NavLink>
@@ -157,11 +102,9 @@ export default function Sidebar({
         {/* LOGOUT */}
         <div className="p-3 border-t">
           <button
-            type="button"
             onClick={() => {
               onLogout();
               onNavigate?.();
-              setMobileOpen(false);
             }}
             className={`
               flex items-center gap-3 w-full px-4 py-3 rounded-lg transition
@@ -174,16 +117,15 @@ export default function Sidebar({
             </span>
           </button>
         </div>
-      </aside>
+      </div>
 
-      {/* ✅ DESKTOP: collapse açma butonu */}
+      {/* ✅ Desktop: daraltılmışken açma butonu */}
       {!open && (
         <button
-          type="button"
           onClick={() => setOpen(true)}
           className="
             hidden md:block
-            fixed top-4 left-4 z-50
+            fixed top-4 left-4 z-[60]
             p-2 rounded-lg backdrop-blur-lg
             bg-gray-900/40 hover:bg-gray-900/60
             transition border border-white/20
